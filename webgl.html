@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>WebGl</title>
+    <style>
+        *{
+            box-sizing: border-box;
+            margin: 0;
+        }
+    </style>
+</head>
+<body>
+    <div style="margin-top: 10vh; display: flex; flex-wrap: wrap; row-gap: 24px; column-gap: 2px; padding: 0 24px;">
+        <canvas id="canvas1" width="300" height="300" style="border: 1px solid pink;"></canvas>
+    </div>
+    <script src="libs/webgl-utils.js"></script>
+    <script src="libs/webgl-debug.js"></script>
+    <script src="libs/cuon-utils.js"></script>
+    <script>
+        (function() {
+            const vsSource = `
+                attribute vec4 aVertexPosition;
+                attribute float aVertexSize;
+
+                void main() {
+                    gl_Position = aVertexPosition;
+                    gl_PointSize = aVertexSize;
+                }
+            `;
+            const fsSource = `
+                void main() {
+                    gl_FragColor = vec4(0.0, 0.0, 1.0, 1.0);
+                }
+            `;
+            /** @type {WebGLRenderingContext} */
+            const gl = getWebGLContext(document.getElementById('canvas1'));
+
+            if (!initShaders(gl, vsSource, fsSource)) {
+                console.log('Failed to initialize shaders.');
+                return;
+            }
+
+            const aVertexPosition = gl.getAttribLocation(gl.program, 'aVertexPosition');
+            gl.vertexAttrib4fv(aVertexPosition, new Float32Array([0.0, 0.0, 0.0, 1.0]));
+
+            const aVertexSize = gl.getAttribLocation(gl.program, 'aVertexSize');
+            gl.vertexAttrib1f(aVertexSize, 10.0);
+
+            // 使用完全不透明的黑色清除所有图像
+            gl.clearColor(0.0, 0.0, 0.0, 0.0);
+            // 用上面指定的颜色清除缓冲区
+            gl.clear(gl.COLOR_BUFFER_BIT);
+
+            gl.drawArrays(gl.POINTS, 0, 1);
+        }());
+    </script>
+</body>
+</html>
